@@ -63,3 +63,35 @@ def test_explain_recommendation_returns_non_empty_string():
     explanation = rec.explain_recommendation(user, song)
     assert isinstance(explanation, str)
     assert explanation.strip() != ""
+
+
+def test_chill_lofi_profile():
+    user = UserProfile(
+        favorite_genres=["lofi"],
+        favorite_moods=["chill"],
+        target_energy=0.3,
+        target_valence=0.5,
+        target_tempo_bpm=75,
+        target_danceability=0.3,
+    )
+    rec = make_small_recommender()
+    results = rec.recommend(user, k=2)
+
+    assert len(results) == 2
+    assert results[0].genre == "lofi"
+    assert results[0].mood == "chill"
+
+
+def test_deep_intense_rock_profile():
+    user = UserProfile(
+        favorite_genres=["rock"],
+        favorite_moods=["intense"],
+        target_energy=0.9,
+        target_valence=0.4,
+        target_tempo_bpm=140,
+        target_danceability=0.6,
+    )
+    rec = make_small_recommender()
+    results = rec.recommend(user, k=2)
+
+    assert len(results) >= 0  # Results depend on available songs

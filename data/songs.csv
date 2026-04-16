@@ -1,19 +1,101 @@
-id,title,artist,genre,mood,energy,tempo_bpm,valence,danceability,acousticness,instrumentalness,liveness,popularity
-1,Sunrise City,Neon Echo,pop,happy,0.82,118,0.84,0.79,0.18,0.05,0.12,78
-2,Midnight Coding,LoRoom,lofi,chill,0.42,78,0.56,0.62,0.71,0.82,0.08,65
-3,Storm Runner,Voltline,rock,intense,0.91,152,0.48,0.66,0.10,0.15,0.30,72
-4,Library Rain,Paper Lanterns,lofi,chill,0.35,72,0.60,0.58,0.86,0.90,0.05,48
-5,Gym Hero,Max Pulse,pop,intense,0.93,132,0.77,0.88,0.05,0.02,0.18,85
-6,Spacewalk Thoughts,Orbit Bloom,ambient,chill,0.28,60,0.65,0.41,0.92,0.95,0.06,35
-7,Coffee Shop Stories,Slow Stereo,jazz,relaxed,0.37,90,0.71,0.54,0.89,0.30,0.45,42
-8,Night Drive Loop,Neon Echo,synthwave,moody,0.75,110,0.49,0.73,0.22,0.60,0.10,70
-9,Focus Flow,LoRoom,lofi,focused,0.40,80,0.59,0.60,0.78,0.88,0.07,58
-10,Rooftop Lights,Indigo Parade,indie pop,happy,0.76,124,0.81,0.82,0.35,0.10,0.22,63
-11,Iron Requiem,Blackveil,metal,aggressive,0.95,168,0.30,0.55,0.08,0.20,0.42,55
-12,Island Breeze,Rootz Collective,reggae,happy,0.65,92,0.83,0.76,0.45,0.12,0.35,50
-13,Moonlit Sonata,Clara Veil,classical,melancholic,0.30,68,0.40,0.32,0.95,0.97,0.15,30
-14,Velvet Groove,Jada Monroe,r&b,romantic,0.58,96,0.78,0.72,0.38,0.08,0.14,74
-15,Neon Pulse,Synthkid,electronic,energetic,0.88,140,0.70,0.85,0.06,0.72,0.20,68
-16,Dusty Trail,Hank Bridger,country,nostalgic,0.52,104,0.63,0.60,0.74,0.15,0.38,40
-17,Street Cipher,K-Lyric,hip-hop,confident,0.80,98,0.72,0.80,0.12,0.04,0.25,82
-18,Fuego Lento,Sol y Sombra,latin,passionate,0.74,108,0.82,0.84,0.30,0.10,0.28,60
+id,title,artist,genre,mood,energy,tempo_bpm,valence,danceability,acousticness,instrumentalness,liveness,popularity,use_case,year,language,description
+1,Sunrise City,Neon Echo,pop,happy,0.82,118,0.84,0.79,0.18,0.05,0.12,78,morning_workout,2023,en,Upbeat pop perfect for starting your day with energy
+2,Midnight Coding,LoRoom,lofi,chill,0.42,78,0.56,0.62,0.71,0.82,0.08,65,focus_work,2022,en,Calm lofi beats ideal for deep concentration sessions
+3,Storm Runner,Voltline,rock,intense,0.91,152,0.48,0.66,0.10,0.15,0.30,72,workout,2023,en,High-energy rock for intense training and cardio
+4,Library Rain,Paper Lanterns,lofi,chill,0.35,72,0.60,0.58,0.86,0.90,0.05,48,study,2021,en,Peaceful lofi for studying and reading sessions
+5,Gym Hero,Max Pulse,pop,intense,0.93,132,0.77,0.88,0.05,0.02,0.18,85,motivation,2024,en,Motivational pop for peak gym performance
+6,Spacewalk Thoughts,Orbit Bloom,ambient,chill,0.28,60,0.65,0.41,0.92,0.95,0.06,35,meditation,2022,en,Ambient soundscape for meditation and relaxation
+7,Coffee Shop Stories,Slow Stereo,jazz,relaxed,0.37,90,0.71,0.54,0.89,0.30,0.45,42,chill_vibe,2021,en,Smooth jazz for coffee shops and afternoon breaks
+8,Night Drive Loop,Neon Echo,synthwave,moody,0.75,110,0.49,0.73,0.22,0.60,0.10,70,evening_drive,2023,en,Retro synthwave perfect for late night drives
+9,Focus Flow,LoRoom,lofi,focused,0.40,80,0.59,0.60,0.78,0.88,0.07,58,productivity,2022,en,Instrumental lofi for sustained focus and work
+10,Rooftop Lights,Indigo Parade,indie pop,happy,0.76,124,0.81,0.82,0.35,0.10,0.22,63,party,2023,en,Infectious indie pop for parties and gatherings
+11,Iron Requiem,Blackveil,metal,aggressive,0.95,168,0.30,0.55,0.08,0.20,0.42,55,workout,2024,en,Powerful metal for intense strength training
+12,Island Breeze,Rootz Collective,reggae,happy,0.65,92,0.83,0.76,0.45,0.12,0.35,50,chill_vibe,2022,en,Relaxed reggae for beach and tropical vibes
+13,Moonlit Sonata,Clara Veil,classical,melancholic,0.30,68,0.40,0.32,0.95,0.97,0.15,30,sleep,2021,en,Elegant classical piece for evening relaxation
+14,Velvet Groove,Jada Monroe,r&b,romantic,0.58,96,0.78,0.72,0.38,0.08,0.14,74,romance,2023,en,Smooth R&B for intimate and romantic moments
+15,Neon Pulse,Synthkid,electronic,energetic,0.88,140,0.70,0.85,0.06,0.72,0.20,68,dance,2024,en,Electronic dance track for clubs and parties
+16,Dusty Trail,Hank Bridger,country,nostalgic,0.52,104,0.63,0.60,0.74,0.15,0.38,40,road_trip,2022,en,Classic country for road trips and nostalgia
+17,Street Cipher,K-Lyric,hip-hop,confident,0.80,98,0.72,0.80,0.12,0.04,0.25,82,hip_hop,2023,en,Confident hip-hop for street and urban vibes
+18,Fuego Lento,Sol y Sombra,latin,passionate,0.74,108,0.82,0.84,0.30,0.10,0.28,60,dance,2024,es,Passionate Latin track for dancing and celebration
+19,Eternal Whisper,Neon Rise,house,passionate,0.46,128,0.38,0.34,0.21,0.89,0.4,84,chill_vibe,2025,en,House masterpiece with passionate undertones
+20,Burning Highway,Lunar Fade,metal,chill,0.4,64,0.8,0.39,0.88,0.07,0.05,65,focus_work,2020,pt,Captivating metal that brings chill energy
+21,Rising Mountain,Ghost Dreams,electronic,peaceful,0.27,78,0.44,0.38,0.46,0.19,0.1,48,dance,2022,de,Electronic masterpiece with peaceful undertones
+22,Rising Dreams,Ghost Night,hip-hop,aggressive,1.0,150,0.46,0.51,0.25,0.22,0.4,90,romance,2023,de,Hip-Hop track perfect for romance vibes
+23,Falling Heart,Golden Rise,soul,happy,0.79,117,0.89,0.65,0.43,0.81,0.32,56,morning_run,2025,pt,Soul track perfect for morning run vibes
+24,Lost City,Golden Rise,classical,passionate,0.47,123,0.44,0.51,0.72,0.17,0.49,94,study,2020,ja,Smooth classical for your study sessions
+25,Falling Echo,Mystic Dreams,hip-hop,playful,0.4,110,0.36,0.32,0.28,0.24,0.18,45,morning_run,2023,pt,Hip-Hop track perfect for morning run vibes
+26,Frozen Echo,Sun Vibes,indie pop,happy,0.83,110,0.83,0.89,0.42,0.93,0.17,72,party,2021,fr,Indie Pop masterpiece with happy undertones
+27,Dancing Dreams,Cosmic Sky,jazz,romantic,0.32,114,0.33,0.69,0.37,0.49,0.09,87,workout,2023,de,Captivating jazz that brings romantic energy
+28,Frozen Heart,Electric Rise,reggae,focused,0.74,100,0.76,0.38,0.21,0.25,0.47,54,chill_vibe,2023,de,Reggae masterpiece with focused undertones
+29,Rising Nights,Velvet Light,country,romantic,0.41,82,0.31,0.39,0.71,0.88,0.13,36,sleep,2025,fr,A romantic country piece ideal for sleep
+30,Falling Heart,Velvet Bloom,synthwave,dark,0.31,114,0.6,0.77,0.24,0.4,0.05,64,reading,2024,ja,Synthwave masterpiece with dark undertones
+31,Lost Mountain,Lunar Pulse,soul,dreamy,0.67,114,0.32,0.64,0.47,0.47,0.21,58,reading,2022,en,A dreamy soul piece ideal for reading
+32,Rising Heart,Stellar Rise,classical,energetic,0.47,89,0.56,0.39,0.39,0.07,0.5,88,cooking,2025,es,Classical masterpiece with energetic undertones
+33,Broken Highway,Electric Heart,trap,happy,0.95,117,0.75,0.9,0.44,0.81,0.14,25,sleep,2024,de,Smooth trap for your sleep sessions
+34,Frozen Rhythm,Sonic Fire,electronic,dreamy,0.57,126,0.75,0.52,0.2,0.01,0.07,77,meditation,2021,fr,Smooth electronic for your meditation sessions
+35,Falling Pulse,Velvet Dreams,rock,moody,0.59,99,0.32,0.43,0.43,0.34,0.12,75,meditation,2023,en,Captivating rock that brings moody energy
+36,Digital Mountain,Thunder Fade,trap,energetic,0.36,107,0.71,0.71,0.28,0.9,0.23,25,road_trip,2025,de,Trap track perfect for road trip vibes
+37,Digital Pulse,Thunder Soul,country,intense,0.94,177,0.61,0.67,0.02,0.93,0.12,94,reading,2023,pt,A intense country piece ideal for reading
+38,Rising City,Silent Ocean,indie pop,chill,0.48,83,0.69,0.31,0.74,0.4,0.08,84,gym,2021,pt,A chill indie pop piece ideal for gym
+39,Eternal Spirit,Electric Rise,jazz,intense,0.9,121,0.51,0.52,0.28,0.09,0.16,72,dance,2025,fr,Smooth jazz for your dance sessions
+40,Digital Mind,Sun Heart,ambient,energetic,0.76,104,0.58,0.77,0.23,0.43,0.25,49,evening_drive,2025,en,A energetic ambient piece ideal for evening drive
+41,Broken City,Stellar Wind,latin,melancholic,0.68,81,0.52,0.53,0.7,0.1,0.18,35,yoga,2020,es,A melancholic latin piece ideal for yoga
+42,Eternal Nights,Lunar Heart,synthwave,chill,0.28,77,0.8,0.42,0.72,0.38,0.45,49,romance,2023,de,Synthwave track perfect for romance vibes
+43,Lost Mind,Sun Heart,metal,happy,0.8,113,0.86,0.91,0.6,0.24,0.48,89,workout,2025,ja,Captivating metal that brings happy energy
+44,Modern Ocean,Twilight Wind,soul,happy,0.83,102,0.95,0.84,0.2,0.85,0.23,45,sleep,2021,ja,Smooth soul for your sleep sessions
+45,Dancing Heart,Crystal Rise,indie pop,happy,0.85,134,0.96,0.65,0.4,0.84,0.22,60,yoga,2025,pt,Smooth indie pop for your yoga sessions
+46,Eternal Spirit,Cosmic Rise,indie rock,energetic,0.5,91,0.41,0.5,0.18,0.87,0.33,38,workout,2024,pt,A energetic indie rock piece ideal for workout
+47,Midnight Rhythm,Echo Vibes,synthwave,aggressive,1.0,126,0.51,0.58,0.05,0.44,0.22,93,sleep,2020,de,Synthwave masterpiece with aggressive undertones
+48,Falling Ocean,Aurora Light,lofi,relaxed,0.34,61,0.75,0.58,0.45,0.71,0.41,86,productivity,2020,pt,A relaxed lofi piece ideal for productivity
+49,Falling Rhythm,Thunder Rise,country,passionate,0.61,87,0.42,0.49,0.52,0.8,0.45,83,romance,2025,fr,Smooth country for your romance sessions
+50,Eternal City,Ghost Light,rock,happy,0.73,125,0.88,0.71,0.39,0.25,0.48,60,creative_work,2020,en,Rock track perfect for creative work vibes
+51,Midnight Dreams,Mystic Rise,funk,confident,0.44,128,0.56,0.42,0.72,0.68,0.25,77,creative_work,2024,pt,A confident funk piece ideal for creative work
+52,Eternal Nights,Ghost Dreams,indie pop,intense,0.84,151,0.65,0.81,0.1,0.52,0.11,77,reading,2022,ja,Indie Pop masterpiece with intense undertones
+53,Falling Spirit,Twilight Rise,jazz,passionate,0.78,109,0.74,0.6,0.23,0.52,0.48,89,dance,2024,es,Smooth jazz for your dance sessions
+54,Burning Spirit,Cosmic Echo,jazz,melancholic,0.48,119,0.37,0.62,0.17,0.02,0.21,87,party,2024,es,Captivating jazz that brings melancholic energy
+55,Retro Dreams,Velvet Pulse,electronic,dark,0.31,124,0.63,0.79,0.2,0.52,0.44,74,morning_run,2021,ja,Electronic track perfect for morning run vibes
+56,Dancing Highway,Mystic Rise,trap,passionate,0.71,104,0.34,0.71,0.21,0.77,0.36,84,gym,2020,es,Captivating trap that brings passionate energy
+57,Midnight Heart,Electric Flow,country,peaceful,0.4,72,0.42,0.43,0.93,0.01,0.41,67,romance,2025,ja,Country masterpiece with peaceful undertones
+58,Frozen Dreams,Lunar Heart,metal,aggressive,0.89,123,0.43,0.89,0.13,0.18,0.47,54,focus_work,2022,es,Metal track perfect for focus work vibes
+59,Broken Dreams,Cosmic Fire,r&b,romantic,0.74,123,0.4,0.43,0.51,0.47,0.21,50,party,2024,pt,R&B masterpiece with romantic undertones
+60,Frozen Memory,Silent Sky,r&b,chill,0.45,76,0.53,0.33,0.44,0.16,0.15,89,study,2025,en,Captivating r&b that brings chill energy
+61,Modern Dreams,Wave Sky,reggae,peaceful,0.29,64,0.57,0.52,0.46,0.64,0.07,44,chill_vibe,2021,fr,Reggae masterpiece with peaceful undertones
+62,Rising Rhythm,Echo Ocean,metal,peaceful,0.34,69,0.41,0.48,0.59,0.14,0.38,42,yoga,2024,es,A peaceful metal piece ideal for yoga
+63,Retro Echo,Echo Day,latin,focused,0.65,110,0.54,0.44,0.37,0.87,0.25,65,chill_vibe,2024,fr,Captivating latin that brings focused energy
+64,Retro Ocean,Sun Fire,rock,dreamy,0.71,121,0.51,0.35,0.4,0.58,0.33,61,yoga,2025,en,Captivating rock that brings dreamy energy
+65,Analog City,Silent Rise,r&b,relaxed,0.22,75,0.76,0.46,0.65,0.63,0.23,53,productivity,2020,ja,Smooth r&b for your productivity sessions
+66,Analog Ocean,Lunar Glow,classical,passionate,0.43,94,0.52,0.61,0.55,0.03,0.42,50,chill_vibe,2020,de,Classical track perfect for chill vibe vibes
+67,Lost Nights,Moon Bloom,latin,focused,0.72,96,0.56,0.55,0.31,0.84,0.07,45,study,2024,de,Latin track perfect for study vibes
+68,Analog Nights,Electric Light,electronic,focused,0.64,130,0.72,0.45,0.7,0.06,0.43,95,romance,2024,es,Captivating electronic that brings focused energy
+69,Broken City,Ghost Light,r&b,dark,0.41,80,0.31,0.56,0.71,0.22,0.24,83,focus_work,2023,fr,R&B track perfect for focus work vibes
+70,Retro Mountain,Ghost Echo,synthwave,passionate,0.31,101,0.64,0.47,0.73,0.67,0.26,34,yoga,2020,fr,Synthwave track perfect for yoga vibes
+71,Eternal Spirit,Moon Sky,house,uplifting,0.6,128,0.87,0.61,0.34,0.18,0.34,48,meditation,2024,de,Smooth house for your meditation sessions
+72,Silent Soul,Moon Dreams,reggae,passionate,0.62,93,0.79,0.76,0.5,0.71,0.24,94,gym,2024,en,Reggae track perfect for gym vibes
+73,Rising Pulse,Echo Vibes,country,relaxed,0.29,61,0.5,0.59,0.41,0.12,0.31,49,productivity,2020,fr,Country track perfect for productivity vibes
+74,Silent Heart,Sonic Storm,rock,energetic,0.49,82,0.56,0.67,0.22,0.37,0.35,27,focus_work,2021,es,Captivating rock that brings energetic energy
+75,Eternal Whisper,Moon Storm,classical,focused,0.4,127,0.75,0.48,0.21,0.61,0.09,33,yoga,2020,es,Classical masterpiece with focused undertones
+76,Dancing Dreams,Ghost Rise,rock,nostalgic,0.55,126,0.78,0.59,0.36,0.48,0.08,54,chill_vibe,2025,pt,Captivating rock that brings nostalgic energy
+77,Modern Highway,Ghost Vibes,pop,chill,0.25,68,0.78,0.32,0.46,0.49,0.18,44,productivity,2025,en,Smooth pop for your productivity sessions
+78,Frozen Highway,Moon Ocean,pop,playful,0.5,122,0.72,0.43,0.14,0.2,0.38,75,road_trip,2021,fr,Pop masterpiece with playful undertones
+79,Rising Soul,Cosmic Vibes,classical,focused,0.43,118,0.58,0.72,0.7,0.84,0.39,25,study,2020,pt,Captivating classical that brings focused energy
+80,Eternal Dreams,Golden Fire,indie rock,peaceful,0.41,71,0.78,0.4,0.78,0.31,0.06,37,meditation,2021,ja,Indie Rock track perfect for meditation vibes
+81,Dancing Heart,Sonic Day,indie pop,focused,0.41,83,0.69,0.33,0.36,0.74,0.22,41,romance,2025,de,A focused indie pop piece ideal for romance
+82,Golden Echo,Moon Day,reggae,focused,0.39,115,0.31,0.48,0.28,0.39,0.43,28,creative_work,2021,pt,Smooth reggae for your creative work sessions
+83,Lost Nights,Thunder Heart,lofi,focused,0.67,84,0.71,0.62,0.29,0.71,0.12,79,party,2024,ja,Captivating lofi that brings focused energy
+84,Golden Whisper,Moon Bloom,house,relaxed,0.42,88,0.53,0.4,0.86,0.09,0.22,57,study,2021,fr,Captivating house that brings relaxed energy
+85,Analog Nights,Mystic Heart,r&b,confident,0.67,111,0.4,0.63,0.17,0.25,0.39,50,party,2022,fr,R&B masterpiece with confident undertones
+86,Burning City,Ghost Soul,reggae,relaxed,0.36,85,0.54,0.44,0.84,0.22,0.2,84,dance,2021,pt,Smooth reggae for your dance sessions
+87,Eternal Rhythm,Neon Vibes,ambient,energetic,0.42,111,0.43,0.74,0.53,0.58,0.39,44,productivity,2022,fr,Ambient track perfect for productivity vibes
+88,Broken Nights,Velvet Soul,r&b,moody,0.65,104,0.57,0.58,0.21,0.04,0.36,33,workout,2020,fr,Captivating r&b that brings moody energy
+89,Golden Highway,Wave Dreams,country,happy,0.91,126,0.78,0.93,0.51,0.14,0.19,45,gym,2020,fr,Country track perfect for gym vibes
+90,Silent Nights,Neon Flow,classical,peaceful,0.2,62,0.47,0.35,0.92,0.23,0.31,69,cooking,2025,en,Classical masterpiece with peaceful undertones
+91,Frozen Echo,Mystic Pulse,indie rock,intense,0.87,153,0.42,0.62,0.09,0.78,0.33,75,gym,2025,es,Captivating indie rock that brings intense energy
+92,Falling Memory,Ghost Dreams,soul,chill,0.44,68,0.58,0.43,0.76,0.87,0.48,34,gym,2024,en,Soul track perfect for gym vibes
+93,Digital Echo,Wave Echo,jazz,happy,0.7,132,0.92,0.77,0.21,0.31,0.32,79,dance,2021,ja,A happy jazz piece ideal for dance
+94,Lost City,Twilight Glow,lofi,passionate,0.35,128,0.32,0.52,0.29,0.18,0.18,79,meditation,2021,en,Lofi track perfect for meditation vibes
+95,Digital City,Sun Sky,house,energetic,0.68,87,0.58,0.38,0.21,0.84,0.22,49,meditation,2020,fr,A energetic house piece ideal for meditation
+96,Lost Spirit,Neon Ocean,classical,passionate,0.32,101,0.31,0.49,0.37,0.44,0.25,67,morning_run,2021,en,Smooth classical for your morning run sessions
+97,Falling Rhythm,Moon Soul,country,dreamy,0.74,111,0.79,0.39,0.52,0.04,0.1,74,romance,2020,ja,Country track perfect for romance vibes
+98,Midnight Whisper,Electric Flow,pop,intense,0.81,150,0.27,0.8,0.19,0.8,0.47,49,gym,2022,fr,Captivating pop that brings intense energy
+99,Burning Pulse,Mystic Night,rock,dark,0.71,97,0.43,0.42,0.17,0.66,0.13,45,yoga,2022,en,Smooth rock for your yoga sessions
+100,Broken Mountain,Sonic Rise,soul,dark,0.32,118,0.32,0.75,0.73,0.52,0.39,82,yoga,2021,es,Captivating soul that brings dark energy

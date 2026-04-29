@@ -1,90 +1,97 @@
-# 🎧 Model Card: Music Recommender Simulation
+# Model card: RhythmFlow
 
-## 1. Model Name  
+## 1. Model name
 
-**TasteAlchemy 1.0**  
+RhythmFlow music recommender
 
----
+## 2. Intended use
 
-## 2. Intended Use  
+RhythmFlow recommends songs from a small local catalog. It is meant for a class project and for testing recommender behavior, not for production music discovery.
 
-TasteAlchemy generates personalized song recommendations by matching user preferences in genre, mood, and energy level. It's designed for exploration of how weighted scoring systems work in recommendations, rather than production use. The system assumes users can clearly specify their genre taste and emotional mood, which limits real-world applicability but makes the scoring logic transparent and testable.  
+A user can ask for music in natural language, such as "chill lofi for studying" or "high energy rock for a workout." The system reads that request, searches the song catalog, scores candidate songs, and returns a ranked list. The app can also use Gemini to explain the results, but Gemini does not decide the ranking.
 
----
+This project is useful because the recommendation logic is small enough to inspect. You can see how a single weight or missing catalog entry changes the output.
 
-## 3. How the Model Works  
+## 3. How the system works
 
-The recommender scores each song on a scale of 0 to 3.5 points based on three factors:
+RhythmFlow has two ranking signals.
 
-1. **Genre match** (1.5 points): Does the song's genre match what the user asked for? If yes, +1.5 points. If no, zero points—this is the heaviest weight, so genre choice matters most.
+First, it uses a RAG layer. Each song is turned into a short text document with its title, artist, genre, mood, use case, language, year, and description. Those documents are embedded and stored in a FAISS index. When a user types a query, the system retrieves songs whose metadata is semantically close to the query.
 
-2. **Mood match** (1.0 point): Does the song's mood (happy, chill, intense, etc.) match the user's preference? If yes, +1.0 point. If no, zero points.
+Second, it uses content scoring. Each candidate song can earn up to 3.5 points:
 
-3. **Energy similarity** (up to 1.0 point): How close is the song's energy level to what the user wants? If it's a perfect match (user wants 0.8 energy, song is 0.8), that's +1.0 point. If it's off by 0.3, the song gets partial credit—maybe +0.7 points.
+- Genre match: 1.5 points
+- Mood match: 1.0 point
+- Energy similarity: up to 1.0 point
 
-The top 5 songs with the highest total scores are recommended. Because genre is weighted so heavily, popular genres like pop and lofi tend to dominate the results, even when other genres might match the user's mood better.
+Energy similarity uses distance from the user's target energy. If the user wants `0.8` energy and the song is also `0.8`, the song gets the full energy point. If the song is `0.5`, it gets partial credit.
 
----
+The hybrid recommender blends the RAG score and content score, then returns the top results. By default, content scoring matters more than semantic search. That keeps the results explainable, but it also means the hand-picked weights have a real effect on what users see.
 
-## 4. Data  
+## 4. Data
 
-The dataset contains **18 songs** across 15 different genres. Genres include pop, lofi, rock, ambient, jazz, synthwave, indie pop, metal, reggae, classical, R&B, electronic, country, hip-hop, and latin. Moods range from happy and chill to intense, melancholic, and energetic. The energy levels span the full 0.0–1.0 range, from slow classical pieces (0.30) to high-intensity metal songs (0.95).
+The dataset is `data/songs.csv`. It contains 18 songs across genres such as pop, lofi, rock, ambient, jazz, synthwave, indie pop, metal, reggae, classical, R&B, electronic, country, hip-hop, and latin.
 
-The dataset is balanced enough for classroom testing but has real limitations: pop and lofi have multiple entries while metal, jazz, and classical each have only one. This artificial imbalance exposes a key weakness of weighted scoring—users seeking niche genres can't get good recommendations because there's insufficient variety in those categories. No songs were added or removed from the original dataset.  
+Each row includes:
 
----
+- Basic metadata: `id`, `title`, `artist`, `genre`, `mood`
+- Audio-style fields: `energy`, `tempo_bpm`, `valence`, `danceability`, `acousticness`
+- Extra context: `use_case`, `language`, `year`, `description`
 
-## 5. Strengths  
+The catalog is big enough to test the recommender, but it is uneven. Pop and lofi have more examples than metal, jazz, or classical. That matters. If a genre only has one song, the system cannot return a varied set of recommendations for that genre.
 
-TasteAlchemy works best for users with **aligned preferences**—when their genre choice, mood, and energy level naturally go together. For example, the Deep Intense Rock profile (rock + intense + 0.9 energy) gets clean, intuitive recommendations because all three scoring factors point to the same songs. The system is also effective for users in the **mainstream genres** like pop and lofi that have multiple entries in the dataset, since variety ensures good recommendations. 
+## 5. What works well
 
-The energy scoring is the system's strongest feature: because it's a continuous scale (0.0–1.0) rather than binary like genre and mood, it captures fine-grained preferences. A user who wants exactly 0.3 energy (chill) gets meaningfully different results than one wanting 0.8 energy (upbeat), which matches real musical taste variation. The recommender correctly surfaces that these two profiles need completely different songs, which shows the energy component works as intended.  
+RhythmFlow works best when the user's preferences agree with each other. A request like "intense rock with high energy" is easy because rock, intense mood, and high energy all point in roughly the same direction.
 
----
+Energy scoring is also useful. It gives the system a sliding scale instead of only yes/no matches. A chill lofi profile with `0.3` target energy gets very different results from a gym profile with `0.9` target energy. That part behaved the way I expected.
 
-## 6. Limitations and Bias 
+The RAG layer helps with natural language. A user does not have to know the exact genre or mood tag in the CSV. Queries like "music for coding late at night" can still retrieve relevant songs because the search reads descriptions and use cases, not only exact labels.
 
-Genre weight creates strong filter bubbles that lock users into narrow recommendation patterns. With genre accounting for 43% of the maximum score, songs from non-preferred genres rarely compete even when they match user mood or energy preferences perfectly. For example, a user who loves "happy" mood songs will score a genre-mismatched reggae track much lower than a genre-matched pop song, regardless of which better suits their actual preferences. This overweighting of categorical matching over contextual fit means the system trains users to expect genre-locked recommendations rather than discovering serendipitous cross-genre hits. Additionally, rare genres (metal, jazz, classical) with only one entry in the dataset are structurally disadvantaged users seeking those genres cannot build coherent recommendations and instead see LoFi/Pop dominate by default.
+## 6. Limitations and bias
 
----
+The genre weight is strong. Since genre is worth 1.5 out of 3.5 content points, genre-matched songs can beat songs that might fit the mood better. This creates a small version of a filter bubble: the system keeps pulling users back toward the genre they named.
 
-## 7. Evaluation  
+The catalog is uneven too. Pop and lofi users get more variety because those genres have more songs. Users asking for metal, jazz, or classical have fewer choices, so the system either repeats narrow results or drifts into other genres.
 
-How you checked whether the recommender behaved as expected.
+Some fields are underused. The CSV includes tempo, valence, danceability, and acousticness, but the main weighted score still uses only genre, mood, and energy. That means a user can care about tempo, but the core score will not fully respect it yet.
 
-### Test Profiles Used
+The system also does not handle contradictions well. If a user asks for "melancholic metal with high energy," the recommender does not stop and say, "That combination is not really in this catalog." It just ranks the closest compromises.
 
-I tested four distinct user profiles to verify the scoring logic:
-- **Starter Profile**: Pop + Happy + 0.8 energy (normal case)
-- **Chill Lofi**: Lofi + Chill + 0.3 energy (relaxed listening)
-- **Deep Intense Rock**: Rock + Intense + 0.9 energy (high-energy rock)
-- **Contradicted User**: Metal + Melancholic + 0.95 energy (conflicting preferences)
-- **Genre Ghost**: Techno (non-existent) + Ethereal (non-existent) + 0.8 energy (edge case)
+Gemini explanations can fail separately from recommendations. If the API key is missing or the model is busy, the app can still rank songs, but the explanation may be unavailable or replaced with a fallback message.
 
-### Comparison Notes
+## 7. Evaluation
 
-**Starter Profile vs. Chill Lofi**: When the user switches from happy pop hits to relaxing lofi beats, the energy preference drops from 0.8 to 0.3—so songs like *Gym Hero* (0.93 energy) that dominated the pop list suddenly disappear, replaced by *Library Rain* and *Midnight Coding*, which are slow enough to match what the user actually wants to listen to.
+I tested the system with normal profiles and edge cases.
 
-**Deep Intense Rock vs. Chill Lofi**: These two profiles are almost complete opposites: deep intense rock wants high energy songs (0.9) while chill lofi wants low-energy songs (0.3), so *Storm Runner* jumps from the bottom of the lofi list to the very top of the rock list—same song, but energy matching flips it from poor fit to perfect fit.
+Test profiles:
 
-**Contradicted User vs. Deep Intense Rock**: The contradicted user asks for metal + melancholic mood + 0.95 energy but metal and intense rock songs have high energy but NOT melancholic vibes, forcing the system to compromise; meanwhile, deep intense rock aligns all preferences (rock genre, intense mood, high energy), so it gets clean recommendations without trade-offs.
+- Starter profile: pop, happy mood, `0.8` energy
+- Chill lofi: lofi, chill mood, `0.3` energy
+- Deep intense rock: rock, intense mood, `0.9` energy
+- Contradicted user: metal, melancholic mood, `0.95` energy
+- Genre ghost: techno, ethereal mood, `0.8` energy
 
-**Starter Profile vs. Genre Ghost**: When the user requests a "techno" genre that doesn't exist in the dataset plus a made-up "ethereal" mood, the recommender can't use genre or mood scoring at all and falls back entirely to energy matching—so the top results become whatever high-energy songs exist (like *Neon Pulse* and *Iron Requiem*) rather than genre-coherent hits like *Sunrise City*.
+What I saw:
 
----
+- The starter profile returned the expected kind of upbeat pop recommendations.
+- Chill lofi shifted the results toward lower-energy tracks like `Library Rain` and `Midnight Coding`.
+- Deep intense rock pushed high-energy songs like `Storm Runner` toward the top.
+- The contradicted profile exposed a weakness. The system had to choose between metal, melancholic mood, and high energy because the catalog does not really contain all three together.
+- The genre ghost profile showed the fallback behavior. When genre and mood do not exist in the catalog, the system leans on energy and semantic similarity, which can produce results that feel less coherent.
 
-## 8. Future Work  
+Automated tests cover the basic scoring order, recommendation explanations, lofi behavior, Gemini fallback behavior, and the dashboard element IDs used by the frontend.
 
-**Expand underrepresented genres**: Add more metal, jazz, and classical songs so users seeking niche genres aren't limited by dataset imbalance. This directly addresses the "rare genre disadvantage" exposed in testing.
+## 8. Future work
 
-**Use the unused tempo feature**: The dataset includes `tempo_bpm` but it's never scored. Adding tempo matching (similar to energy scoring) would give users finer control over tempo preferences and help distinguish between songs with similar energy.
+- Add more songs, especially for genres with only one example.
+- Use tempo, valence, danceability, and acousticness in the scoring function.
+- Detect conflicting requests before ranking.
+- Tell the user when the catalog does not contain a requested genre or mood.
+- Add diversity logic so the top results are not all pulled from the same narrow area.
+- Store profiles and feedback in a database instead of local JSON files.
+- Let users adjust the weights from the UI.
 
-**Detect and handle contradictions**: When a user asks for conflicting preferences (high energy + melancholic mood), the system could warn the user or suggest they adjust their preferences rather than forcing poor compromises. This would make recommendations more transparent.
+## 9. Responsible use notes
 
-**Inject diversity into results**: Instead of always returning the top 5 scores, occasionally include slightly lower-scoring songs from different genres to break filter bubbles and enable cross-genre discovery—the opposite of what currently happens.
-
-**Let users adjust weights**: Allow power users to set their own weights (e.g., "energy matters twice as much as mood to me") so the system is less one-size-fits-all.  
-
----
-
-
+RhythmFlow should not be treated like a full music platform. It is a small recommender demo with a tiny dataset. Its results reflect the catalog and the weights I chose. If the catalog is unbalanced, the recommendations will be unbalanced too.

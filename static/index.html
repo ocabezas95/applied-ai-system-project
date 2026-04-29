@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>RhythmFlow - RAG Music Recommendation System</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com" rel="preconnect">
+    <link crossorigin href="https://fonts.gstatic.com" rel="preconnect">
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "surface-variant": "#dae2fd",
+                        "secondary-fixed": "#d1e4ff",
+                        "tertiary-fixed-dim": "#bfc6dd",
+                        "on-background": "#131b2e",
+                        "on-tertiary-fixed": "#141b2c",
+                        "secondary-fixed-dim": "#a6c9f5",
+                        "inverse-on-surface": "#eef0ff",
+                        "surface-container": "#eaedff",
+                        "tertiary-container": "#656d81",
+                        "background": "#faf8ff",
+                        "primary-container": "#2e5bff",
+                        "on-surface": "#131b2e",
+                        "on-primary": "#ffffff",
+                        "outline": "#747688",
+                        "on-primary-container": "#efefff",
+                        "surface-container-highest": "#dae2fd",
+                        "primary-fixed": "#dde1ff",
+                        "error": "#ba1a1a",
+                        "surface-container-low": "#f2f3ff",
+                        "on-surface-variant": "#434656",
+                        "primary": "#0040e0",
+                        "outline-variant": "#c4c5d9",
+                        "surface-dim": "#d2d9f4",
+                        "secondary": "#3d6187",
+                        "tertiary": "#4d5568",
+                        "secondary-container": "#aed2fe",
+                        "inverse-surface": "#283044",
+                        "on-secondary-container": "#365a80",
+                        "surface": "#faf8ff",
+                        "tertiary-fixed": "#dbe2fa",
+                        "surface-container-lowest": "#ffffff"
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.25rem",
+                        lg: "0.5rem",
+                        xl: "0.75rem",
+                        full: "9999px"
+                    },
+                    spacing: {
+                        md: "1.5rem",
+                        gutter: "24px",
+                        sm: "1rem",
+                        xs: "0.5rem",
+                        margin: "32px",
+                        base: "4px",
+                        lg: "2.5rem",
+                        xl: "4rem"
+                    },
+                    fontFamily: {
+                        "headline-md": ["Be Vietnam Pro"],
+                        "body-md": ["Inter"],
+                        "display-lg": ["Be Vietnam Pro"],
+                        "title-sm": ["Inter"],
+                        "label-sm": ["Inter"]
+                    },
+                    fontSize: {
+                        "headline-md": ["32px", { lineHeight: "1.2", letterSpacing: "-0.01em", fontWeight: "600" }],
+                        "body-md": ["16px", { lineHeight: "1.6", fontWeight: "400" }],
+                        "display-lg": ["48px", { lineHeight: "1.1", letterSpacing: "-0.02em", fontWeight: "700" }],
+                        "title-sm": ["20px", { lineHeight: "1.4", fontWeight: "600" }],
+                        "label-sm": ["13px", { lineHeight: "1", letterSpacing: "0.05em", fontWeight: "500" }]
+                    }
+                }
+            }
+        };
+    </script>
+</head>
+<body class="stitch-dashboard bg-background text-on-background font-body-md text-body-md h-screen w-full overflow-hidden flex antialiased selection:bg-primary-container selection:text-on-primary-container">
+    <nav class="bg-slate-50 dark:bg-slate-950 text-blue-600 dark:text-blue-400 font-be-vietnam-pro text-sm h-screen w-64 fixed left-0 top-0 border-r border-slate-200 dark:border-slate-800 flex flex-col pt-20 pb-6 z-40">
+        <div class="absolute top-0 left-0 w-full h-20 flex items-center px-6">
+            <div class="flex items-center gap-xs">
+                <span class="material-symbols-outlined icon-fill text-primary text-[28px]">graphic_eq</span>
+                <div class="flex flex-col">
+                    <span class="text-lg font-black text-blue-600 dark:text-blue-400 leading-tight">RhythmFlow</span>
+                    <span class="font-label-sm text-label-sm text-slate-500">AI Music Discovery</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex flex-col flex-1 overflow-y-auto">
+            <ul class="flex flex-col w-full">
+                <li>
+                    <a class="flex items-center gap-md text-slate-600 dark:text-slate-400 py-3 px-4 hover:bg-slate-100 dark:hover:bg-slate-900 transition-all duration-200 hover:translate-x-1" href="#">
+                        <span class="material-symbols-outlined">home</span>
+                        <span>Home</span>
+                    </a>
+                </li>
+                <li>
+                    <a class="flex items-center gap-md text-slate-600 dark:text-slate-400 py-3 px-4 hover:bg-slate-100 dark:hover:bg-slate-900 transition-all duration-200 hover:translate-x-1" href="#">
+                        <span class="material-symbols-outlined">explore</span>
+                        <span>Discovery</span>
+                    </a>
+                </li>
+                <li>
+                    <a class="flex items-center gap-md text-slate-600 dark:text-slate-400 py-3 px-4 hover:bg-slate-100 dark:hover:bg-slate-900 transition-all duration-200 hover:translate-x-1" href="#">
+                        <span class="material-symbols-outlined">library_music</span>
+                        <span>Library</span>
+                    </a>
+                </li>
+                <li>
+                    <a class="flex items-center gap-md border-l-4 border-blue-600 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 font-medium py-3 px-4 hover:bg-slate-100 dark:hover:bg-slate-900 transition-all duration-200 hover:translate-x-1" href="#">
+                        <span class="material-symbols-outlined icon-fill">forum</span>
+                        <span>Chat History</span>
+                    </a>
+                </li>
+            </ul>
+
+            <div class="mt-lg px-4 flex flex-col flex-1 min-h-0">
+                <h3 class="font-label-sm text-label-sm text-slate-400 uppercase tracking-wider mb-sm">Past Queries</h3>
+                <div class="chat-history-list flex flex-col gap-xs overflow-y-auto flex-1" id="chat-history-list">
+                    <p class="empty-state text-sm text-slate-400 px-2 py-4">No chat history yet</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="px-4 mt-auto flex flex-col gap-sm">
+            <button id="generate-playlist-btn" class="w-full py-2 px-4 bg-primary-container text-on-primary-container rounded-lg font-medium hover:bg-primary-fixed transition-colors flex items-center justify-center gap-xs">
+                <span class="material-symbols-outlined text-sm">add</span>
+                Create Playlist
+            </button>
+            <div class="h-px w-full bg-slate-200 dark:bg-slate-800 my-xs"></div>
+            <button id="clear-chat-btn" class="flex items-center gap-md text-slate-600 dark:text-slate-400 py-2 hover:text-error transition-colors text-sm">
+                <span class="material-symbols-outlined text-lg">delete</span>
+                Clear Chat
+            </button>
+            <button id="export-history-btn" class="flex items-center gap-md text-slate-600 dark:text-slate-400 py-2 hover:text-primary transition-colors text-sm">
+                <span class="material-symbols-outlined text-lg">download</span>
+                Export History
+            </button>
+        </div>
+    </nav>
+
+    <main class="ml-64 flex-1 flex flex-col h-screen overflow-hidden relative">
+        <header class="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md text-blue-600 dark:text-blue-400 font-be-vietnam-pro antialiased z-50 border-b border-slate-200/50 dark:border-slate-800/50 shadow-sm flex justify-between items-center px-6 h-16 w-full absolute top-0 left-0">
+            <div>
+                <span id="session-id-display" class="session-id text-xs text-slate-500">Session: Loading...</span>
+            </div>
+            <div class="flex items-center gap-sm">
+                <button aria-label="Toggle Theme" id="dark-mode-toggle" class="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-full border border-slate-200 dark:border-slate-700 transition-all hover:ring-2 hover:ring-primary/20 group">
+                    <div class="flex items-center justify-center w-8 h-8 rounded-full transition-all bg-white dark:bg-transparent shadow-sm dark:shadow-none text-amber-500 dark:text-slate-500">
+                        <span class="material-symbols-outlined text-[20px]">light_mode</span>
+                    </div>
+                    <div class="flex items-center justify-center w-8 h-8 rounded-full transition-all bg-transparent dark:bg-slate-900 shadow-none dark:shadow-sm text-slate-400 dark:text-primary">
+                        <span class="material-symbols-outlined text-[20px] dark:icon-fill">dark_mode</span>
+                    </div>
+                </button>
+                <button class="p-xs rounded-full text-slate-500 dark:text-slate-400 hover:text-blue-500 dark:hover:text-blue-300 transition-colors active:scale-95 relative">
+                    <span class="material-symbols-outlined">notifications</span>
+                    <span class="absolute top-1 right-1 w-2 h-2 bg-error rounded-full"></span>
+                </button>
+                <button class="p-xs rounded-full text-slate-500 dark:text-slate-400 hover:text-blue-500 dark:hover:text-blue-300 transition-colors active:scale-95">
+                    <span class="material-symbols-outlined icon-fill">account_circle</span>
+                </button>
+            </div>
+        </header>
+
+        <div class="flex-1 flex flex-row p-gutter gap-gutter mt-16 overflow-hidden bg-surface-container-lowest">
+            <section class="flex-1 flex flex-col min-w-[400px] bg-surface rounded-xl border border-outline-variant shadow-sm overflow-hidden relative z-10">
+                <div id="chat-container" class="chat-container flex-1 overflow-y-auto p-md flex flex-col gap-lg bg-gradient-to-b from-surface to-surface-container-low/30">
+                    <div class="welcome-message flex items-start gap-sm max-w-[85%]">
+                        <div class="w-8 h-8 rounded-full bg-primary-container text-primary flex items-center justify-center shrink-0">
+                            <span class="material-symbols-outlined text-[18px]">graphic_eq</span>
+                        </div>
+                        <div class="bg-surface-variant text-on-surface-variant p-sm rounded-r-xl rounded-tl-xl rounded-bl-sm shadow-sm">
+                            <p class="font-body-md text-body-md">Welcome back. Ask for music recommendations in natural language, and I will tune them with your RAG profile.</p>
+                        </div>
+                    </div>
+                    <div id="recommendations-container" class="recommendations-container flex flex-col gap-sm w-full mt-xs"></div>
+                </div>
+
+                <div class="p-md bg-surface border-t border-outline-variant flex flex-col gap-sm">
+                    <div class="flex items-center gap-sm bg-surface-container-low rounded-xl border border-outline-variant focus-within:border-primary focus-within:ring-1 focus-within:ring-primary transition-all p-1 pl-4">
+                        <input id="query-input" class="flex-1 bg-transparent border-none focus:ring-0 text-on-surface font-body-md text-body-md placeholder:text-outline p-0 h-10" placeholder="Ask for music recommendations..." type="text" autocomplete="off">
+                        <button id="send-btn" class="w-10 h-10 rounded-lg bg-primary text-on-primary flex items-center justify-center hover:bg-primary/90 transition-colors shrink-0 shadow-sm">
+                            <span class="material-symbols-outlined">send</span>
+                        </button>
+                    </div>
+                    <div class="flex justify-between items-center px-1">
+                        <span class="font-label-sm text-label-sm text-outline flex items-center gap-1">
+                            <span class="material-symbols-outlined text-[16px]">info</span>
+                            Using profile preferences for tuning
+                        </span>
+                        <div id="loading-spinner" class="loading-spinner hidden items-center gap-2 text-sm text-primary">
+                            <div class="spinner"></div>
+                            <span>Finding recommendations...</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <aside class="w-[320px] shrink-0 flex flex-col gap-gutter overflow-y-auto pr-2 pb-md scroll-smooth">
+                <div class="bg-surface rounded-xl border border-outline-variant p-md shadow-sm">
+                    <div class="flex items-center gap-2 mb-md border-b border-outline-variant/50 pb-sm">
+                        <span class="material-symbols-outlined text-secondary">tune</span>
+                        <h2 class="font-title-sm text-title-sm text-on-surface">Listening Profile</h2>
+                    </div>
+                    <div class="mb-md">
+                        <label class="font-label-sm text-label-sm text-on-surface-variant block mb-xs">Favorite Genres</label>
+                        <div id="genres-tags" class="tags-container flex flex-wrap gap-xs">
+                            <span class="tag bg-secondary-container text-on-secondary-container rounded-full px-3 py-1 font-label-sm text-[12px] border border-secondary/20">None yet</span>
+                        </div>
+                    </div>
+                    <div class="mb-md">
+                        <label class="font-label-sm text-label-sm text-on-surface-variant block mb-xs">Typical Moods</label>
+                        <div id="moods-tags" class="tags-container flex flex-wrap gap-xs">
+                            <span class="tag bg-tertiary-container/30 text-on-surface rounded-full px-3 py-1 font-label-sm text-[12px] border border-tertiary/20">None yet</span>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between items-end mb-xs">
+                            <label class="font-label-sm text-label-sm text-on-surface-variant" for="energy-slider">Default Energy Target</label>
+                            <span id="energy-display" class="text-xs font-medium text-primary">70%</span>
+                        </div>
+                        <input id="energy-slider" class="energy-slider w-full h-2 bg-surface-variant rounded-lg appearance-none cursor-pointer accent-primary" max="1" min="0" step="0.1" type="range" value="0.7">
+                        <div class="flex justify-between text-[10px] text-outline mt-1 font-label-sm">
+                            <span>Chill</span>
+                            <span>High Octane</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-surface rounded-xl border border-outline-variant p-md shadow-sm">
+                    <div class="flex items-center gap-2 mb-md border-b border-outline-variant/50 pb-sm">
+                        <span class="material-symbols-outlined text-secondary">analytics</span>
+                        <h2 class="font-title-sm text-title-sm text-on-surface">RAG Tuning Stats</h2>
+                    </div>
+                    <div class="grid grid-cols-2 gap-sm">
+                        <div class="bg-surface-container-low p-sm rounded-lg flex flex-col justify-center">
+                            <span class="text-[11px] text-outline font-label-sm uppercase tracking-wider mb-1">Total Feedback</span>
+                            <span id="total-feedback" class="font-headline-md text-headline-md text-on-surface">0</span>
+                        </div>
+                        <div class="bg-primary-container/20 p-sm rounded-lg flex flex-col justify-center border border-primary/10">
+                            <span class="text-[11px] text-primary font-label-sm uppercase tracking-wider mb-1">Approval Rate</span>
+                            <span id="approval-rate" class="font-headline-md text-headline-md text-primary">N/A</span>
+                        </div>
+                        <div class="bg-surface-container-low p-sm rounded-lg flex flex-col justify-center">
+                            <span class="text-[11px] text-outline font-label-sm uppercase tracking-wider mb-1">Thumbs Up</span>
+                            <span id="thumbs-up" class="font-headline-md text-headline-md text-on-surface">0</span>
+                        </div>
+                        <div class="bg-surface-container-low p-sm rounded-lg flex flex-col justify-center">
+                            <span class="text-[11px] text-outline font-label-sm uppercase tracking-wider mb-1">Thumbs Down</span>
+                            <span id="thumbs-down" class="font-headline-md text-headline-md text-on-surface">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-surface rounded-xl border border-outline-variant p-md shadow-sm mt-auto">
+                    <div class="flex items-center gap-2 mb-md border-b border-outline-variant/50 pb-sm">
+                        <span class="material-symbols-outlined text-secondary">settings_suggest</span>
+                        <h2 class="font-title-sm text-title-sm text-on-surface">Session Controls</h2>
+                    </div>
+                    <div class="flex flex-col gap-sm">
+                        <div class="flex flex-col gap-1">
+                            <label class="font-label-sm text-[11px] text-outline uppercase tracking-wider" for="user-id-input">Profile Name</label>
+                            <div class="flex gap-2">
+                                <input id="user-id-input" class="input-field flex-1 bg-surface-container-low border border-outline-variant rounded-md px-3 py-1.5 text-sm focus:ring-1 focus:ring-primary outline-none text-on-surface" type="text" placeholder="Enter username">
+                                <button id="save-profile-btn" class="bg-primary text-on-primary px-3 py-1.5 rounded-md text-sm font-medium hover:bg-primary/90 transition-colors shadow-sm">Save</button>
+                            </div>
+                        </div>
+                        <div class="h-px bg-outline-variant/50 my-1"></div>
+                        <div class="flex flex-col gap-2">
+                            <label class="font-label-sm text-[11px] text-outline uppercase tracking-wider" for="profile-select">Load Preset</label>
+                            <div class="flex gap-2">
+                                <select id="profile-select" class="input-field flex-1 bg-surface border border-outline-variant rounded-md px-3 py-2 text-sm text-on-surface focus:ring-1 focus:ring-primary outline-none cursor-pointer">
+                                    <option value="">-- Select a profile --</option>
+                                </select>
+                                <button id="load-profile-btn" class="bg-surface-variant text-on-surface-variant border border-outline-variant hover:bg-surface-dim hover:text-on-surface transition-colors px-3 py-2 rounded-md text-sm font-medium">Load</button>
+                            </div>
+                        </div>
+                        <button id="export-feedback-btn" class="mt-2 w-full bg-surface-variant text-on-surface-variant border border-outline-variant hover:bg-surface-dim hover:text-on-surface transition-colors py-2 rounded-md text-sm font-medium flex justify-center items-center gap-2 shadow-sm">
+                            <span class="material-symbols-outlined text-[18px]">download</span>
+                            Export Feedback CSV
+                        </button>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </main>
+
+    <div id="playlist-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <button class="modal-close">&times;</button>
+            <h2>Generated Playlist</h2>
+            <div id="playlist-content"></div>
+            <button class="btn btn-primary" onclick="closePlaylistModal()">Close</button>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

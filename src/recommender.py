@@ -1,4 +1,5 @@
 import csv
+import os
 from typing import List, Dict, Tuple, Optional
 from dataclasses import dataclass
 from sentence_transformers import SentenceTransformer
@@ -500,7 +501,7 @@ def create_hybrid_recommender(csv_path: str, rag_weight: float = 0.4, content_we
 
 class LLMInterface:
     """
-    Abstract interface for LLM backends (OpenAI or Ollama).
+    Abstract interface for LLM backends.
     Subclasses implement actual LLM calls.
     """
     
@@ -558,7 +559,7 @@ class OllamaLLM(LLMInterface):
                     "stream": False,
                     "num_predict": max_tokens,
                 },
-                timeout=30
+                timeout=120
             )
             if response.status_code == 200:
                 return response.json()["response"].strip()
@@ -600,12 +601,120 @@ Be conversational and avoid technical jargon."""
         return self.generate(prompt, max_tokens=300)
 
 
+class GeminiLLM(LLMInterface):
+    """
+    Google Gemini LLM via the official google-genai SDK.
+
+    Requires:
+    - GEMINI_API_KEY set in the environment or loaded from a .env file
+    - google-genai installed
+    """
+
+    def __init__(self, model: str = "gemini-2.5-flash"):
+        self.model = model
+        self.api_key = os.getenv("GEMINI_API_KEY")
+        self.client = None
+        self._legacy_model = None
+        self._client_error = None
+
+        if not self.api_key:
+            self._client_error = "GEMINI_API_KEY is not set. Add it to your .env file."
+            print(f"⚠️  Gemini not configured: {self._client_error}")
+            return
+
+        try:
+            from google import genai
+            self.client = genai.Client()
+            print(f"✓ Gemini configured with model {self.model}")
+        except ImportError:
+            try:
+                import google.generativeai as legacy_genai
+                legacy_genai.configure(api_key=self.api_key)
+                self._legacy_model = legacy_genai.GenerativeModel(self.model)
+                print(f"✓ Gemini configured with legacy google-generativeai SDK and model {self.model}")
+            except ImportError:
+                self._client_error = (
+                    "Gemini SDK is not installed. Run 'pip install -r requirements.txt' "
+                    "or install google-generativeai."
+                )
+                print(f"⚠️  Gemini SDK unavailable: {self._client_error}")
+            except Exception as e:
+                self._client_error = str(e)
+                print(f"⚠️  Gemini client failed to initialize: {e}")
+        except Exception as e:
+            self._client_error = str(e)
+            print(f"⚠️  Gemini client failed to initialize: {e}")
+
+    def generate(self, prompt: str, max_tokens: int = 500) -> str:
+        """Generate text using Gemini."""
+        if self._client_error:
+            return self.sanitize_explanation(f"[Gemini Error: {self._client_error}]")
+
+        try:
+            if self.client:
+                response = self.client.models.generate_content(
+                    model=self.model,
+                    contents=prompt,
+                )
+            else:
+                response = self._legacy_model.generate_content(prompt)
+            text = getattr(response, "text", "")
+            return text.strip() if text else "[Gemini Error: Empty response]"
+        except Exception as e:
+            return self.sanitize_explanation(f"[Gemini Error: {str(e)}]")
+
+    def sanitize_explanation(self, explanation: str) -> str:
+        """Replace transient model-capacity errors with a user-facing message."""
+        if (
+            explanation
+            and "[Gemini Error:" in explanation
+            and ("503" in explanation or "UNAVAILABLE" in explanation or "high demand" in explanation.lower())
+        ):
+            return (
+                "AI explanation is temporarily unavailable because the model is busy. "
+                "Showing recommendations based on similarity search."
+            )
+        return explanation
+
+    def summarize_songs(self, songs: List[Song], query: str, retrieval_context: List[Dict]) -> str:
+        """Generate natural language summary of recommendations."""
+        song_list = "\n".join([
+            f"- {s.title} by {s.artist} ({s.genre}, {s.mood}, {s.use_case}): {s.description}"
+            for s in songs
+        ])
+        context_blocks = "\n\n".join([
+            (
+                f"Title: {item['title']}\n"
+                f"RAG score: {item['rag_score']}\n"
+                f"Content score: {item['content_score']}\n"
+                f"Source document:\n{item['document']}"
+            )
+            for item in retrieval_context
+        ])
+
+        prompt = f"""Given the user query: "{query}"
+
+Here are my recommendations:
+{song_list}
+
+Retrieved evidence:
+{context_blocks}
+
+Write a brief, friendly explanation (2-3 sentences) of why these songs match the request.
+Use only the retrieved evidence above, and do not invent attributes that are not present.
+Be conversational and avoid technical jargon."""
+
+        return self.generate(prompt, max_tokens=300)
+
+
 class ConversationalRecommender:
     """
     Conversational music recommender combining:
     1. Hybrid recommender (RAG + content-based scoring)
     2. LLM for natural language explanations
     3. Chat history management
+    4. Feedback logging (thumbs up/down)
+    5. Playlist generation
     
     Provides a chat-like interface where users can ask for recommendations
     in natural language and get detailed, personalized responses.
@@ -620,6 +729,8 @@ class ConversationalRecommender:
         self.hybrid = hybrid_recommender
         self.llm = llm
         self.chat_history: List[Dict] = []
+        self.session_history: List[Dict] = []  # Track all user queries and preferences over time
+        self.feedback_log: List[Dict] = []  # Track feedback on recommendations
         self.user_profile = UserProfile(
             favorite_genres=[],
             favorite_moods=[],
@@ -632,16 +743,18 @@ class ConversationalRecommender:
     def extract_preferences_from_query(self, query: str) -> Dict:
         """
         Parse user query to extract preferences (heuristic-based).
+        Merges new preferences with existing user profile (context-aware).
         
         Examples:
         - "pop songs" -> genres: [pop]
         - "happy upbeat music" -> moods: [happy]
         - "slow relaxing songs" -> energy: 0.3
+        - "Make them more energetic" -> merge with existing genres/moods, increase energy
         """
         query_lower = query.lower()
         extracted = {
-            "genres": [],
-            "moods": [],
+            "genres": list(self.user_profile.favorite_genres),  # Start with existing
+            "moods": list(self.user_profile.favorite_moods),    # Start with existing
             "energy": None,
         }
         
@@ -655,7 +768,8 @@ class ConversationalRecommender:
         }
         for keyword, genre in genres_map.items():
             if keyword in query_lower:
-                extracted["genres"].append(genre)
+                if genre not in extracted["genres"]:
+                    extracted["genres"].append(genre)
         
         # Mood extraction (simple heuristic)
         moods_map = {
@@ -665,13 +779,18 @@ class ConversationalRecommender:
         }
         for keyword, mood in moods_map.items():
             if keyword in query_lower:
-                extracted["moods"].append(mood)
+                if mood not in extracted["moods"]:
+                    extracted["moods"].append(mood)
         
         # Energy extraction (heuristic)
         if any(word in query_lower for word in ["slow", "chill", "relax", "calm"]):
             extracted["energy"] = 0.3
-        elif any(word in query_lower for word in ["energetic", "upbeat", "high energy", "intense"]):
-            extracted["energy"] = 0.85
+        elif any(word in query_lower for word in ["energetic", "upbeat", "high energy", "intense", "more energetic"]):
+            # If user asks to increase energy from current level
+            if "more energetic" in query_lower or "more upbeat" in query_lower:
+                extracted["energy"] = min(1.0, self.user_profile.target_energy + 0.25)
+            else:
+                extracted["energy"] = 0.85
         
         return extracted
     
@@ -691,13 +810,25 @@ class ConversationalRecommender:
         # Step 1: Extract preferences from user input
         prefs = self.extract_preferences_from_query(user_input)
         
-        # Step 2: Update user profile with extracted preferences
+        # Step 2: Update user profile with extracted preferences (merge mode)
         if prefs["genres"]:
             self.user_profile.favorite_genres = prefs["genres"]
         if prefs["moods"]:
             self.user_profile.favorite_moods = prefs["moods"]
         if prefs["energy"] is not None:
             self.user_profile.target_energy = prefs["energy"]
+        
+        # Step 2b: Record in session history (for tracking conversation context)
+        self.session_history.append({
+            "timestamp": timestamp,
+            "query": user_input,
+            "extracted_preferences": prefs,
+            "user_profile_state": {
+                "favorite_genres": list(self.user_profile.favorite_genres),
+                "favorite_moods": list(self.user_profile.favorite_moods),
+                "target_energy": self.user_profile.target_energy,
+            }
+        })
         
         # Step 3: Get hybrid recommendations
         recommendations = self.hybrid.recommend(
@@ -821,6 +952,151 @@ class ConversationalRecommender:
                 output.append(f"Summary: {rec['llm_explanation'][:100]}...")
         
         return "\n".join(output)
+    
+    def log_feedback(self, song_id: int, rating: int, query: str = "", song_title: str = "") -> Dict:
+        """
+        Log feedback (thumbs up/down) for a recommended song.
+        
+        Args:
+            song_id: Song ID that was rated
+            rating: +1 for thumbs up, -1 for thumbs down
+            query: The query that led to this recommendation (optional)
+            song_title: Song title for reference (optional)
+        
+        Returns:
+            Feedback entry as dict
+        """
+        timestamp = datetime.now().isoformat()
+        feedback_entry = {
+            "timestamp": timestamp,
+            "song_id": song_id,
+            "song_title": song_title,
+            "rating": rating,  # +1 or -1
+            "query": query,
+            "user_profile_state": {
+                "favorite_genres": list(self.user_profile.favorite_genres),
+                "favorite_moods": list(self.user_profile.favorite_moods),
+                "target_energy": self.user_profile.target_energy,
+            }
+        }
+        self.feedback_log.append(feedback_entry)
+        return feedback_entry
+    
+    def get_feedback_stats(self) -> Dict:
+        """
+        Calculate feedback statistics.
+        
+        Returns:
+            Dict with feedback metrics
+        """
+        if not self.feedback_log:
+            return {
+                "total_feedback": 0,
+                "thumbs_up": 0,
+                "thumbs_down": 0,
+                "approval_rate": 0.0
+            }
+        
+        thumbs_up = sum(1 for fb in self.feedback_log if fb["rating"] > 0)
+        thumbs_down = sum(1 for fb in self.feedback_log if fb["rating"] < 0)
+        total = len(self.feedback_log)
+        approval_rate = thumbs_up / total if total > 0 else 0.0
+        
+        return {
+            "total_feedback": total,
+            "thumbs_up": thumbs_up,
+            "thumbs_down": thumbs_down,
+            "approval_rate": round(approval_rate, 2)
+        }
+    
+    def generate_playlist(self, duration_minutes: int = 30, k: int = 10) -> Dict:
+        """
+        Generate a playlist based on current user profile and top recommendations.
+        
+        Args:
+            duration_minutes: Target playlist duration (for reference)
+            k: Number of songs in playlist
+        
+        Returns:
+            Playlist dict with song list, metadata, total duration
+        """
+        # Use current user profile to get top recommendations
+        if not self.user_profile.favorite_genres and not self.user_profile.favorite_moods:
+            # No preferences set yet, generate from all songs
+            query = "diverse music recommendations"
+        else:
+            # Generate query from current preferences
+            genres = ", ".join(self.user_profile.favorite_genres) if self.user_profile.favorite_genres else "any genre"
+            moods = ", ".join(self.user_profile.favorite_moods) if self.user_profile.favorite_moods else "any mood"
+            query = f"{genres} {moods} music"
+        
+        # Get recommendations
+        recommendations = self.hybrid.recommend(
+            query,
+            self.user_profile,
+            k=k,
+            expansion_factor=2
+        )
+        
+        # Build playlist
+        timestamp = datetime.now().isoformat()
+        playlist_songs = []
+        total_duration_seconds = 0
+        
+        for i, (song, score, metadata) in enumerate(recommendations, 1):
+            # Estimate duration from tempo (rough estimate: ~3-4 min per song)
+            estimated_duration_seconds = 180 + (song.tempo_bpm / 120 * 30)
+            total_duration_seconds += estimated_duration_seconds
+            
+            playlist_songs.append({
+                "rank": i,
+                "song_id": song.id,
+                "title": song.title,
+                "artist": song.artist,
+                "genre": song.genre,
+                "mood": song.mood,
+                "use_case": song.use_case,
+                "energy": song.energy,
+                "tempo_bpm": song.tempo_bpm,
+                "estimated_duration_seconds": round(estimated_duration_seconds),
+                "score": round(score, 3),
+            })
+        
+        return {
+            "timestamp": timestamp,
+            "name": f"Playlist - {self.user_profile.favorite_genres[0] if self.user_profile.favorite_genres else 'Discovery'}",
+            "query": query,
+            "songs": playlist_songs,
+            "total_songs": len(playlist_songs),
+            "total_duration_seconds": round(total_duration_seconds),
+            "total_duration_minutes": round(total_duration_seconds / 60, 1),
+            "user_profile": {
+                "favorite_genres": self.user_profile.favorite_genres,
+                "favorite_moods": self.user_profile.favorite_moods,
+                "target_energy": self.user_profile.target_energy,
+            }
+        }
+    
+    def get_session_summary(self) -> Dict:
+        """
+        Get a summary of the current session.
+        
+        Returns:
+            Session summary with history, feedback stats, and current profile
+        """
+        return {
+            "session_length": len(self.session_history),
+            "total_queries": len([s for s in self.session_history if s["query"]]),
+            "current_profile": {
+                "favorite_genres": self.user_profile.favorite_genres,
+                "favorite_moods": self.user_profile.favorite_moods,
+                "target_energy": self.user_profile.target_energy,
+            },
+            "feedback_stats": self.get_feedback_stats(),
+            "session_history_length": len(self.session_history),
+            "chat_history_length": len(self.chat_history),
+        }
+
 
 
 def create_conversational_recommender(csv_path: str, use_llm: bool = False, llm_type: str = "ollama") -> ConversationalRecommender:
@@ -830,7 +1106,7 @@ def create_conversational_recommender(csv_path: str, use_llm: bool = False, llm_
     Args:
         csv_path: Path to songs CSV file
         use_llm: Whether to use LLM for explanations
-        llm_type: "ollama" (free, local) or "openai" (requires API key)
+        llm_type: "gemini" (API key) or "ollama" (free, local)
     
     Returns:
         ConversationalRecommender ready for chat
@@ -839,8 +1115,10 @@ def create_conversational_recommender(csv_path: str, use_llm: bool = False, llm_
     
     llm = None
     if use_llm:
-        if llm_type == "ollama":
-            llm = OllamaLLM(model="mistral")
+        if llm_type == "gemini":
+            llm = GeminiLLM()
+        elif llm_type == "ollama":
+            llm = OllamaLLM(model="neural-chat")
         else:
             print(f"⚠️  LLM type '{llm_type}' not yet implemented. Using basic explanations.")
     

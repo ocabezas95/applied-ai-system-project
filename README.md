@@ -145,3 +145,11 @@ What still needs work:
 - Let users adjust the scoring weights from the UI.
 
 See [model_card.md](model_card.md) for more detail on limitations, bias, and evaluation.
+
+
+## Demo
+<video width="640" height="480" controls>
+  <source src="assets/RhythmFlow Demo.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
+

@@ -149,4 +149,7 @@ See [model_card.md](model_card.md) for more detail on limitations, bias, and eva
 
 ## Demo
 
-![demo video](assets/RhythmFlow%20Demo.mp4)
+[![Demo Screenshot](assets/Screenshot%202026-04-28%20at%2011.13.30 PM.png)](https://docs.google.com/videos/d/1l6Y7flKCKTGkY6NhimQUIXYHzz9W2OvapglCr9cLAPg/edit?usp=sharing)
+
+Watch the walkthrough: [Google Vids Demo](https://docs.google.com/videos/d/1l6Y7flKCKTGkY6NhimQUIXYHzz9W2OvapglCr9cLAPg/edit?usp=sharing)
+
